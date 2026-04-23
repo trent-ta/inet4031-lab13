@@ -5,42 +5,129 @@ This lab introduces Docker and Docker Compose by having you containerize a
 real, multi-service application. You will package three components: Apache,
 Flask, and MariaDB. These will be packaged into separate containers and wired together so they function as a complete application.
 
-The application code and scaffolding are provided. Your job is to complete the Dockerfiles, verify the stack runs correctly, and document your work below.
-
-> **Directions and explanations for this lab are on the repository Wiki.**
-> Refer to the Wiki pages for step-by-step instructions.
-
----
-
-*The sections below are for you to fill out. Replace each placeholder with your own content before submitting. Having a detailed README is the best practice for showing your work in future GitHub repositories.*
-
----
-
 # Project Overview
 
-<!-- Briefly describe what this application does in your own words.
-     What problem does it solve? What does a user interact with? -->
+This application demonstrates a simple ticket system that allows users to view and create ticket through a web interface. For the frontend, it is served by Apache, while the backend API is handled through Flask. All of the ticket data is stored in a MariaDb database.
 
 # Prerequisites
 
-<!-- List what needs to be installed or configured on the VM before this lab
-     will work. Include Docker, Docker Compose, and anything else required. -->
+Before running this lab, the following must be set up:
+- Docker installed on the VM (installed through VS Code SSH terminal)
+- Docker Compose installed
+- Git installed
+- Linux-based environment (Ubuntu VM)
+- Port 80 must be free (Stop Apache on the VM is needed)
 
 # Getting Started
 
-<!-- Explain how a new teammate would bring this stack up from a fresh clone.
-     Walk through every command they need to run, in order. -->
+1. Clone the repository:
 
+```bash
+git clone https://github.com/Programming-Mellow/inet4031-testlab12.git
+cd inet4031-testlab12
+```
+2. Install Docker by following the guide:https: //docs.docker.com/engine/install/ubuntu/
+
+3. Afterwards, verify that Docker and Docker Compose are installed on your VM:
+
+```bash
+docker --version
+docker compose version
+```
+4. Create the environment file:
+
+```bash
+cp .env.example .env
+```
+5. Complete the Dockerfiles
+
+In app/Dockerfile, the missing lines are:
+
+```dockerfile
+COPY app.py .
+CMD ["python", "app.p
+```
+In apache/Dockerfile, the missing lines are:
+
+```dockerfile
+COPY app.py .
+CMD ["python", "app.p
+```
+6. Build and start the containers:
+
+```bash
+sudo docker compose up --build
+```
+7. Open a new terminal and check container status:
+
+```bash
+sudo docker compose ps
+```
+
+The db and app containers should show healthy, and the web container should show running.
+- db = healthy
+- app = healthy
+- web = running
 # Configuration
 
-<!-- Explain the .env file: what it is, what variables it contains,
-     and what a teammate needs to provide that is not in this repository. -->
+The .env file stores important settings like database usernames and passwords. It is not included in the repository for security reasons.
 
+Each person needs to create their own .env file by copying the template:
+
+```bash
+cp .env.example .env
+```
 # Verification
 
-<!-- Describe how to confirm the stack is running correctly.
-     Reference the check script and what a passing run looks like. -->
+1. Build and start the containers:
 
-# Feedback (Optional)
+```bash
+sudo docker compose up --build
+```
+2. Open a new terminal and check container status:
 
-<!-- Do you have any feedback you would like to give us after completing this lab? What are some things you enjoyed? What about others that you felt was lackluster? Or maybe there was something that we missed that you'd love for us to touch on! This will help us improve the INET 4031 lab experience. We appreciate everything we can get!  -->
+```bash
+sudo docker compose ps
+```
+The db and app containers should show healthy, and the web container should show running.
+
+3. Next, open a browser and type:
+
+VM's IP address
+
+You should see the Ticket System page with a green “API healthy” indicator and at least one ticket.
+
+4. The Flask health endpoint is reachable through Apache:
+
+```bash
+curl http://localhost:80/health
+```
+Expected: {"database": "connected","status": "healthy"}
+
+5. Create a ticket
+
+```bash
+curl -X POST http://localhost:80/api/tickets \
+  -H "Content-Type: application/json" \
+  -d '{"title": "My first ticket", "description": "Testing the API"}'
+```
+6. Test data persistence:
+
+```bash
+sudo docker compose stop db
+sudo docker compose start db
+```
+then:
+
+```bash
+curl http://localhost:80/api/tickets
+```
+Your ticket should still be there.
+
+7. Run the Check Script
+
+```bash
+chmod +x check-lab.sh
+sudo ./check-lab.sh
+```
+The script will run through each condition and print PASS or FAIL with a hint for anything that fails.
