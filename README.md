@@ -131,3 +131,19 @@ chmod +x check-lab.sh
 sudo ./check-lab.sh
 ```
 The script will run through each condition and print PASS or FAIL with a hint for anything that fails.
+
+# Lab 13 - Kubernetes Deployment
+
+In Lab 13, this application was moved from Docker Compose to Kubernetes using k3s. Instead of running the services with docker compose, the application now uses Kubernetes Deployments, Services, a Secret for database credentials, and a PersistentVolumeClaim for database storage. This allows the system to automatically restart containers and keep the application running if something fails.
+
+## Deploy Command
+
+```bash
+kubectl apply -f k8s/
+```
+# Access URL
+Open a browser and go to:
+
+http://<VM-IP>:30080
+
+
